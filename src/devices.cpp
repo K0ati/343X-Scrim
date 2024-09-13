@@ -3,49 +3,40 @@
 #include "devices.hpp"
 #include "drivercontrol.hpp"
 
-bool horzWingsOut = false;
-bool vertWingsOut = false;
-bool isSlap = false;
-bool dropOut = false;
-bool isRatchetOut = true;
-pros::ADIDigitalOut vertwing1('A');
-pros::ADIDigitalOut vertwing2('B');
-pros::ADIDigitalOut horzwing1('C');
-pros::ADIDigitalOut ratchet('D');
-pros::ADIDigitalOut horzwing2('E');
+bool clampOut = true;
+bool shiftKey = false;
+bool intakeDirection;
 
-// pros::ADIDigitalIn limitswitch ('E');
+pros::ADIDigitalOut mogoClamp('A');
 
+pros::Motor intake (1, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor intake2 (10, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES);
 
-pros::Motor intake (-1, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor slapHang1 (-15, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor slapHang2 (17, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
-
-pros::Motor leftFront(11, pros::E_MOTOR_GEARSET_06, true); 
-pros::Motor leftBack(12, pros::E_MOTOR_GEARSET_06, true); 
-pros::Motor leftTop(-13, pros::E_MOTOR_GEARSET_06, false); 
-pros::Motor rightFront(20, pros::E_MOTOR_GEARSET_06, false); 
-pros::Motor rightBack(19, pros::E_MOTOR_GEARSET_06, false); 
-pros::Motor rightTop(-18, pros::E_MOTOR_GEARSET_06, true); 
+pros::Motor leftFront(12, pros::E_MOTOR_GEARSET_06, true); 
+pros::Motor leftBack(13, pros::E_MOTOR_GEARSET_06, true); 
+pros::Motor leftTop(14, pros::E_MOTOR_GEARSET_06, false); 
+pros::Motor rightFront(16, pros::E_MOTOR_GEARSET_06, false); 
+pros::Motor rightBack(17, pros::E_MOTOR_GEARSET_06, false); 
+pros::Motor rightTop(18, pros::E_MOTOR_GEARSET_06, true); 
 
 pros::MotorGroup left_side_motors({leftFront, leftBack, leftTop});
 pros::MotorGroup right_side_motors({rightFront, rightFront, rightTop});
 
-pros::Imu inertial_sensor(14); 
+pros::Imu inertial_sensor(20); 
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
 Drive EzTempChassis (
   // Left Chassis Ports (negative port will reverse it!)
   //   the first port is the sensored port (when trackers are not used!)
-  {-11, -12, 13}
+  {-12, -13, -14}
 
   // Right Chassis Ports (negative port will reverse it!)
   //   the first port is the sensored port (when trackers are not used!)
-  ,{20, 19, -18}
+  ,{16, 17, 18}
 
   // IMU Port
-  ,14
+  ,20
 
   // Wheel Diameter (Remember, 4" wheels are actually 4.125!)
   //    (or tracking wheel diameter)
@@ -155,7 +146,7 @@ void checkDTMotorsAndReturnTemperature() {
 
 void checkOtherMotorsAndReturnTemperature() {
     std::vector<pros::Motor> motors2 = {
-        intake, slapHang1, slapHang2
+        intake, intake2
     };
 
     while (true) {
@@ -224,4 +215,31 @@ void ezTempChassisInits() {
     EzTempChassis.opcontrol_drive_activebrake_set(0); // Sets the active brake kP. We recommend 0.1.
     EzTempChassis.opcontrol_curve_default_set(7, 0); // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)  
     default_constants(); // Set the drive to your own constants from autons.cpp!
+}
+
+void functionClampOut(bool clampOut) {
+    if (clampOut) {
+        mogoClamp.set_value(false);
+    } else {
+        mogoClamp.set_value(true);
+    }
+}
+
+void runIntake(bool intakeDirection) {
+    if (pros::E_CONTROLLER_DIGITAL_L1 || pros::E_CONTROLLER_DIGITAL_L2) {
+        if (intakeDirection = true) {
+            intake = 127;
+            intake2 = -127;
+        } else {
+            intake = -127;
+            intake2 = 127;
+        }
+    } else {
+        intake = 0;
+        intake2 = 0;
+    }
+}
+
+void functionShiftKey() {
+    
 }

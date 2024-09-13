@@ -139,52 +139,7 @@ void opcontrol() {
         // );
 
         EzTempChassis.opcontrol_tank();
-
-		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A)) { 
-            toggleSlapHang();
-            pros::delay(250);
-        } 
-
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) { 
-            toggleRatchet();
-            pros::delay(250);
-        }
-
-        bool isR1Pressed = master.get_digital(pros::E_CONTROLLER_DIGITAL_R1);
-        bool isR2Pressed = master.get_digital(pros::E_CONTROLLER_DIGITAL_R2);
-        if (isR1Pressed && !wasR1PressedLast) {
-            toggleVertWings();
-        }
-        wasR1PressedLast = isR1Pressed;
-
-        // Toggle Horz Wings on rising edge of DOWN button press
-        if (isR2Pressed && !wasR2PressedLast) {
-            toggleHorzWings();
-        }
-        wasR2PressedLast = isR2Pressed;   
-
         
-
-        if (!isSlap) {
-            if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) { 
-                setSlapHang(127); 
-            } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) { 
-                setSlapHang(-127); 
-            } else { 
-                setSlapHang(0);
-            }
-        } else {
-            setSlapHang(-85);
-        }      
-
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) { 
-            intake = 127; 
-        } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) { 
-            intake = -127; 
-        } else { 
-            intake = 0; 
-        }   
-
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_B)) { 
             motorCheckDT.suspend(); 
             motorCheckOther.suspend(); 
